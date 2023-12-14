@@ -51,5 +51,5 @@ app <- shinyApp(
 )
 
 ## ----echo=TRUE, eval = FALSE--------------------------------------------------
-#  runApp(app)
+#  shinyApp(app$ui, app$server)
 

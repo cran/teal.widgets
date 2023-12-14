@@ -36,7 +36,7 @@ This package provides various widgets for `teal` applications. Examples include:
 
 ```r
 # stable versions
-install.packages('teal.widgets', repos = c('https://insightsengineering.r-universe.dev', getOption('repos')))
+install.packages('teal.widgets')
 
 # install.packages("pak")
 pak::pak("insightsengineering/teal.widgets@*release")
@@ -68,8 +68,8 @@ If you encounter a bug or you have a feature request - please file an issue. For
 
 ### Stargazers
 
-[![Stargazers repo roster for @insightsengineering/teal.widgets](https://reporoster.com/stars/insightsengineering/teal.widgets)](https://github.com/insightsengineering/teal.widgets/stargazers)
+[![Stargazers repo roster for @insightsengineering/teal.widgets](http://reporoster.com/stars/insightsengineering/teal.widgets)](https://github.com/insightsengineering/teal.widgets/stargazers)
 
 ### Forkers
 
-[![Forkers repo roster for @insightsengineering/teal.widgets](https://reporoster.com/forks/insightsengineering/teal.widgets)](https://github.com/insightsengineering/teal.widgets/network/members)
+[![Forkers repo roster for @insightsengineering/teal.widgets](http://reporoster.com/forks/insightsengineering/teal.widgets)](https://github.com/insightsengineering/teal.widgets/network/members)

@@ -119,7 +119,8 @@ plot_with_settings_ui <- function(id) {
 #'   ),
 #'   server = function(input, output, session) {
 #'     plot_r <- reactive({
-#'       ggplot2::qplot(x = 1, y = 1)
+#'       ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+#'         ggplot2::geom_point()
 #'     })
 #'
 #'     plot_with_settings_srv(
@@ -132,7 +133,7 @@ plot_with_settings_ui <- function(id) {
 #' )
 #'
 #' if (interactive()) {
-#'   runApp(app1)
+#'   shinyApp(app1$ui, app1$server)
 #' }
 #'
 #' # Example using a function as input to plot_r
@@ -173,7 +174,7 @@ plot_with_settings_ui <- function(id) {
 #' )
 #'
 #' if (interactive()) {
-#'   runApp(app2)
+#'   shinyApp(app2$ui, app2$server)
 #' }
 #'
 #' # Example with brushing/hovering/clicking/double-clicking
@@ -191,7 +192,8 @@ plot_with_settings_ui <- function(id) {
 #'   ),
 #'   server = function(input, output, session) {
 #'     plot_r <- reactive({
-#'       ggplot2::qplot(x = 1:5, y = 1:5)
+#'       ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+#'         ggplot2::geom_point()
 #'     })
 #'
 #'     plot_data <- plot_with_settings_srv(
@@ -212,7 +214,7 @@ plot_with_settings_ui <- function(id) {
 #' )
 #'
 #' if (interactive()) {
-#'   runApp(app3)
+#'   shinyApp(app3$ui, app3$server)
 #' }
 #'
 #' # Example which allows module to be hidden/shown
@@ -227,7 +229,10 @@ plot_with_settings_ui <- function(id) {
 #'     )
 #'   ),
 #'   server = function(input, output, session) {
-#'     plot_r <- reactive(ggplot2::qplot(data = faithful, x = waiting, y = eruptions))
+#'     plot_r <- plot_r <- reactive(
+#'       ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+#'         ggplot2::geom_point()
+#'     )
 #'
 #'     show_hide_signal_rv <- reactiveVal(TRUE)
 #'
@@ -244,7 +249,7 @@ plot_with_settings_ui <- function(id) {
 #' )
 #'
 #' if (interactive()) {
-#'   runApp(app4)
+#'   shinyApp(app4$ui, app4$server)
 #' }
 #'
 plot_with_settings_srv <- function(id,
@@ -382,8 +387,8 @@ plot_with_settings_srv <- function(id,
     p_width <- reactive(`if`(!is.null(input$width), input$width, default_slider_width()[1]))
     output$plot_main <- renderPlot(
       apply_plot_modifications(
-        plot_obj = plot_r(),
-        plot_type = plot_type(),
+        plot_obj = plot_suppress(plot_r()),
+        plot_type = plot_suppress(plot_type()),
         dblclicking = dblclicking,
         ranges = ranges
       ),
@@ -394,8 +399,8 @@ plot_with_settings_srv <- function(id,
 
     output$plot_modal <- renderPlot(
       apply_plot_modifications(
-        plot_obj = plot_r(),
-        plot_type = plot_type(),
+        plot_obj = plot_suppress(plot_r()),
+        plot_type = plot_suppress(plot_type()),
         dblclicking = dblclicking,
         ranges = ranges
       ),
@@ -405,7 +410,7 @@ plot_with_settings_srv <- function(id,
     )
 
     output$plot_out_main <- renderUI({
-      req(plot_r())
+      req(plot_suppress(plot_r()))
       div(
         align = graph_align,
         plotOutput(
@@ -423,7 +428,7 @@ plot_with_settings_srv <- function(id,
       grDevices::pdf(NULL) # reset Rplots.pdf for shiny server
       w <- grDevices::dev.size("px")[1]
       grDevices::dev.off()
-      if (`if`(!is.null(input$width), input$width, default_slider_width()[1]) < w) {
+      if (p_width() < w) {
         helpText(
           icon("triangle-exclamation"),
           "Plot might be cut off for small widths."
@@ -435,9 +440,9 @@ plot_with_settings_srv <- function(id,
       id = "downbutton",
       plot_reactive = plot_r,
       plot_type = plot_type,
-      plot_w = reactive(`if`(!is.null(input$width), input$width, default_slider_width()[1])),
+      plot_w = p_width,
       default_w = default_w,
-      plot_h = reactive(`if`(!is.null(input$height), input$height, height[1])),
+      plot_h = p_height,
       default_h = default_h
     )
 
@@ -456,7 +461,7 @@ plot_with_settings_srv <- function(id,
               optionalSliderInputValMinMax(
                 inputId = ns("height_in_modal"),
                 label = "Plot height",
-                value_min_max = round(c(`if`(!is.null(input$height), input$height, height[1]), height[2:3])),
+                value_min_max = round(c(p_height(), height[2:3])),
                 ticks = FALSE,
                 step = 1L,
                 round = TRUE
@@ -530,7 +535,7 @@ plot_with_settings_srv <- function(id,
           input$width
           input$plot_hover
         }),
-        dim = reactive(c(input$width, input$height))
+        dim = reactive(c(p_width(), p_height()))
       )
     )
   })

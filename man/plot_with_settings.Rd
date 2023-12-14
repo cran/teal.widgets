@@ -88,7 +88,8 @@ app1 <- shinyApp(
   ),
   server = function(input, output, session) {
     plot_r <- reactive({
-      ggplot2::qplot(x = 1, y = 1)
+      ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+        ggplot2::geom_point()
     })
 
     plot_with_settings_srv(
@@ -101,7 +102,7 @@ app1 <- shinyApp(
 )
 
 if (interactive()) {
-  runApp(app1)
+  shinyApp(app1$ui, app1$server)
 }
 
 # Example using a function as input to plot_r
@@ -142,7 +143,7 @@ app2 <- shinyApp(
 )
 
 if (interactive()) {
-  runApp(app2)
+  shinyApp(app2$ui, app2$server)
 }
 
 # Example with brushing/hovering/clicking/double-clicking
@@ -160,7 +161,8 @@ app3 <- shinyApp(
   ),
   server = function(input, output, session) {
     plot_r <- reactive({
-      ggplot2::qplot(x = 1:5, y = 1:5)
+      ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+        ggplot2::geom_point()
     })
 
     plot_data <- plot_with_settings_srv(
@@ -181,7 +183,7 @@ app3 <- shinyApp(
 )
 
 if (interactive()) {
-  runApp(app3)
+  shinyApp(app3$ui, app3$server)
 }
 
 # Example which allows module to be hidden/shown
@@ -196,7 +198,10 @@ app4 <- shinyApp(
     )
   ),
   server = function(input, output, session) {
-    plot_r <- reactive(ggplot2::qplot(data = faithful, x = waiting, y = eruptions))
+    plot_r <- plot_r <- reactive(
+      ggplot2::ggplot(faithful, ggplot2::aes(x = waiting, y = eruptions)) +
+        ggplot2::geom_point()
+    )
 
     show_hide_signal_rv <- reactiveVal(TRUE)
 
@@ -213,7 +218,7 @@ app4 <- shinyApp(
 )
 
 if (interactive()) {
-  runApp(app4)
+  shinyApp(app4$ui, app4$server)
 }
 
 }
