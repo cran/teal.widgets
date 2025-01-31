@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_dt_rows.R
 \name{get_dt_rows}
 \alias{get_dt_rows}
-\title{Maps the \code{lengthMenu}selected value property of \code{DT::datatable} to a Shiny variable.}
+\title{Map \code{lenghtMenu} property}
 \usage{
 get_dt_rows(dt_name, dt_rows)
 }
@@ -15,14 +15,18 @@ get_dt_rows(dt_name, dt_rows)
 (\code{shiny::tagList}) A \verb{shiny tagList}.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}\cr
+Maps the \code{lengthMenu} selected value property of \code{DT::datatable} to a \code{shiny} variable.
 }
 \examples{
+\dontshow{if (require("DT")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 library(shiny)
+library(DT)
+
 ui <- function(id) {
   ns <- NS(id)
   tagList(
-    DT::DTOutput(ns("data_table")),
+    DTOutput(ns("data_table")),
     get_dt_rows(ns("data_table"), ns("dt_rows"))
   )
 }
@@ -30,7 +34,7 @@ ui <- function(id) {
 # use the input$dt_rows in the Shiny Server function
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
-    output$data_table <- DT::renderDataTable(
+    output$data_table <- renderDataTable(
       {
         iris
       },
@@ -45,4 +49,5 @@ if (interactive()) {
     server = function(input, output, session) server("my_table_module")
   )
 }
+\dontshow{\}) # examplesIf}
 }

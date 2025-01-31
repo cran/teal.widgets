@@ -1,3 +1,16 @@
+#' @keywords internal
+#' @noRd
+draggable_buckets_deps <- function() {
+  htmltools::htmlDependency(
+    name = "teal-widgets-draggable-buckets",
+    version = utils::packageVersion("teal.widgets"),
+    package = "teal.widgets",
+    src = "draggable-buckets",
+    script = "draggable-buckets.js",
+    stylesheet = "draggable-buckets.css"
+  )
+}
+
 #' @title Draggable Buckets
 #' @description  `r lifecycle::badge("experimental")`
 #' A custom widget with draggable elements that can be put into buckets.
@@ -14,12 +27,13 @@
 #' @details `shinyvalidate` validation can be used with this widget. See example below.
 #'
 #' @examples
+#' library(shiny)
 #'
-#' ui <- shiny::fluidPage(
+#' ui <- fluidPage(
 #'   draggable_buckets("id", "Choices #1", c("a", "b"), c("bucket1", "bucket2")),
 #'   draggable_buckets("id2", "Choices #2", letters, c("vowels", "consonants")),
-#'   shiny::verbatimTextOutput("out"),
-#'   shiny::verbatimTextOutput("out2")
+#'   verbatimTextOutput("out"),
+#'   verbatimTextOutput("out2")
 #' )
 #' server <- function(input, output) {
 #'   iv <- shinyvalidate::InputValidator$new()
@@ -29,30 +43,30 @@
 #'   )
 #'   iv$enable()
 #'
-#'   shiny::observeEvent(list(input$id, input$id2), {
+#'   observeEvent(list(input$id, input$id2), {
 #'     print(isolate(input$id))
 #'     print(isolate(input$id2))
 #'   })
-#'   output$out <- shiny::renderPrint({
+#'   output$out <- renderPrint({
 #'     iv$is_valid()
 #'     input$id
 #'   })
-#'   output$out2 <- shiny::renderPrint(input$id2)
+#'   output$out2 <- renderPrint(input$id2)
 #' }
-#' if (interactive()) shiny::shinyApp(ui, server)
+#' if (interactive()) shinyApp(ui, server)
 #'
 #' # With default elements in the bucket
-#' ui <- shiny::fluidPage(
+#' ui <- fluidPage(
 #'   draggable_buckets("id", "Choices #1", c("a", "b"), list(bucket1 = character(), bucket2 = c("c"))),
-#'   shiny::verbatimTextOutput("out")
+#'   verbatimTextOutput("out")
 #' )
 #' server <- function(input, output) {
-#'   shiny::observeEvent(input$id, {
-#'     print(shiny::isolate(input$id))
+#'   observeEvent(input$id, {
+#'     print(isolate(input$id))
 #'   })
-#'   output$out <- shiny::renderPrint(input$id)
+#'   output$out <- renderPrint(input$id)
 #' }
-#' if (interactive()) shiny::shinyApp(ui, server)
+#' if (interactive()) shinyApp(ui, server)
 draggable_buckets <- function(input_id, label, elements = character(), buckets) {
   checkmate::assert_string(input_id)
   checkmate::assert_true(inherits(label, "character") || inherits(label, "shiny.tag"))
@@ -66,12 +80,9 @@ draggable_buckets <- function(input_id, label, elements = character(), buckets) 
   elements_iterator$it <- 0
 
   shiny::tagList(
-    shiny::singleton(shiny::tags$head(
-      shiny::includeScript(system.file("widgets/draggable_buckets.js", package = "teal.widgets"))
-    )),
-    include_css_files("draggable_buckets.css"),
+    draggable_buckets_deps(),
     shiny::div(
-      shiny::tags$span(label),
+      tags$span(label),
       render_unbucketed_elements(elements = elements, elements_iterator = elements_iterator, widget_id = input_id),
       render_buckets(buckets = buckets, elements_iterator = elements_iterator, widget_id = input_id),
       class = "draggableBuckets",
@@ -81,7 +92,7 @@ draggable_buckets <- function(input_id, label, elements = character(), buckets) 
 }
 
 render_unbucketed_elements <- function(elements, elements_iterator, widget_id) {
-  shiny::tags$div(
+  tags$div(
     lapply(elements, function(element) {
       elements_iterator$it <- elements_iterator$it + 1
       render_draggable_element(
@@ -115,7 +126,7 @@ render_buckets <- function(buckets, elements_iterator, widget_id) {
 }
 
 render_draggable_element <- function(value, id, widget_id) {
-  shiny::tags$div(
+  tags$div(
     value,
     id = id,
     class = "element",
@@ -128,8 +139,8 @@ render_draggable_element <- function(value, id, widget_id) {
 }
 
 render_bucket <- function(name, elements = NULL, elements_iterator = NULL, widget_id = NULL) {
-  shiny::tags$div(
-    shiny::tags$div(
+  tags$div(
+    tags$div(
       paste0(name, ":"),
       class = "bucket-name",
       ondragover = "allowDrop(event)",

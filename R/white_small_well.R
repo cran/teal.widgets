@@ -1,6 +1,7 @@
-#' Adds Class Small Well and overflow-x property to HTML output element
+#' Small well class for HTML
 #'
-#' @description `r lifecycle::badge("stable")`
+#' @description `r lifecycle::badge("stable")`\cr
+#' Adds Small Well class and overflow-x property to HTML output element.
 #' @param ... other arguments to pass to tag object's div attributes.
 #'
 #' @details `white_small_well` is intended to be used with [shiny::uiOutput()].
@@ -16,9 +17,9 @@
 #' white_small_well(shiny::htmlOutput("summary"))
 white_small_well <- function(...) {
   shiny::tagList(
-    include_css_files(pattern = "custom"),
     tags$div(
-      class = "well well-sm bg-white",
+      class = "well well-sm",
+      style = "background-color: white;",
       ...
     )
   )

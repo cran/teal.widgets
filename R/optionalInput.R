@@ -1,3 +1,15 @@
+#' @keywords internal
+#' @noRd
+optional_select_input_deps <- function() {
+  htmltools::htmlDependency(
+    name = "teal-widgets-optional-select-input",
+    version = utils::packageVersion("teal.widgets"),
+    package = "teal.widgets",
+    src = "optional-select-input",
+    stylesheet = "optional-select-input.css"
+  )
+}
+
 #' Wrapper for `pickerInput`
 #'
 #' @description `r lifecycle::badge("stable")`
@@ -13,13 +25,13 @@
 #'  A separator string to split the `choices` or `selected` inputs into the values of the different
 #'  columns.
 #'
-#' @param label_help (`shiny.tag` optional)\cr
+#' @param label_help (`shiny.tag`) optional,\cr
 #'  e.g. an object returned by [shiny::helpText()].
 #'
-#' @param fixed (`logical(1)` optional)\cr
+#' @param fixed (`logical(1)`) optional,\cr
 #'  whether to block user to select choices.
 #'
-#' @param fixed_on_single (`logical(1)` optional)\cr
+#' @param fixed_on_single (`logical(1)`) optional,\cr
 #'  whether to block user to select a choice when there is only one or less choice.
 #'  When `FALSE`, user is still able to select or deselect the choice.
 #'
@@ -52,101 +64,87 @@
 #'   )
 #' }
 #'
-#'
-#' app <- shinyApp(
-#'   ui = ui_grid(
-#'     div(
-#'       optionalSelectInput(
-#'         inputId = "c1",
-#'         label = "Fixed choices",
-#'         choices = LETTERS[1:5],
-#'         selected = c("A", "B"),
-#'         fixed = TRUE
-#'       ),
-#'       verbatimTextOutput(outputId = "c1_out")
+#' ui <- ui_grid(
+#'   tags$div(
+#'     optionalSelectInput(
+#'       inputId = "c1",
+#'       label = "Fixed choices",
+#'       choices = LETTERS[1:5],
+#'       selected = c("A", "B"),
+#'       fixed = TRUE
 #'     ),
-#'     div(
-#'       optionalSelectInput(
-#'         inputId = "c2",
-#'         label = "Single choice",
-#'         choices = "A",
-#'         selected = "A"
-#'       ),
-#'       verbatimTextOutput(outputId = "c2_out")
-#'     ),
-#'     div(
-#'       optionalSelectInput(
-#'         inputId = "c3",
-#'         label = "NULL choices",
-#'         choices = NULL
-#'       ),
-#'       verbatimTextOutput(outputId = "c3_out")
-#'     ),
-#'     div(
-#'       optionalSelectInput(
-#'         inputId = "c4",
-#'         label = "Default",
-#'         choices = LETTERS[1:5],
-#'         selected = "A"
-#'       ),
-#'       verbatimTextOutput(outputId = "c4_out")
-#'     ),
-#'     div(
-#'       optionalSelectInput(
-#'         inputId = "c5",
-#'         label = "Named vector",
-#'         choices = c(`A - value A` = "A", `B - value B` = "B", `C - value C` = "C"),
-#'         selected = "A"
-#'       ),
-#'       verbatimTextOutput(outputId = "c5_out")
-#'     ),
-#'     div(
-#'       selectInput(
-#'         inputId = "c6_choices", label = "Update choices", choices = letters, multiple = TRUE
-#'       ),
-#'       optionalSelectInput(
-#'         inputId = "c6",
-#'         label = "Updated choices",
-#'         choices = NULL,
-#'         multiple = TRUE,
-#'         fixed_on_single = TRUE
-#'       ),
-#'       verbatimTextOutput(outputId = "c6_out")
-#'     )
+#'     verbatimTextOutput(outputId = "c1_out")
 #'   ),
-#'   server = function(input, output, session) {
-#'     observeEvent(input$c6_choices, ignoreNULL = FALSE, {
-#'       updateOptionalSelectInput(
-#'         session = session,
-#'         inputId = "c6",
-#'         choices = input$c6_choices,
-#'         selected = input$c6_choices
-#'       )
-#'     })
-#'
-#'     output$c1_out <- renderPrint({
-#'       input$c1
-#'     })
-#'     output$c2_out <- renderPrint({
-#'       input$c2
-#'     })
-#'     output$c3_out <- renderPrint({
-#'       input$c3
-#'     })
-#'     output$c4_out <- renderPrint({
-#'       input$c4
-#'     })
-#'     output$c5_out <- renderPrint({
-#'       input$c5
-#'     })
-#'     output$c6_out <- renderPrint({
-#'       input$c6
-#'     })
-#'   }
+#'   tags$div(
+#'     optionalSelectInput(
+#'       inputId = "c2",
+#'       label = "Single choice",
+#'       choices = "A",
+#'       selected = "A"
+#'     ),
+#'     verbatimTextOutput(outputId = "c2_out")
+#'   ),
+#'   tags$div(
+#'     optionalSelectInput(
+#'       inputId = "c3",
+#'       label = "NULL choices",
+#'       choices = NULL
+#'     ),
+#'     verbatimTextOutput(outputId = "c3_out")
+#'   ),
+#'   tags$div(
+#'     optionalSelectInput(
+#'       inputId = "c4",
+#'       label = "Default",
+#'       choices = LETTERS[1:5],
+#'       selected = "A"
+#'     ),
+#'     verbatimTextOutput(outputId = "c4_out")
+#'   ),
+#'   tags$div(
+#'     optionalSelectInput(
+#'       inputId = "c5",
+#'       label = "Named vector",
+#'       choices = c(`A - value A` = "A", `B - value B` = "B", `C - value C` = "C"),
+#'       selected = "A"
+#'     ),
+#'     verbatimTextOutput(outputId = "c5_out")
+#'   ),
+#'   tags$div(
+#'     selectInput(
+#'       inputId = "c6_choices", label = "Update choices", choices = letters, multiple = TRUE
+#'     ),
+#'     optionalSelectInput(
+#'       inputId = "c6",
+#'       label = "Updated choices",
+#'       choices = NULL,
+#'       multiple = TRUE,
+#'       fixed_on_single = TRUE
+#'     ),
+#'     verbatimTextOutput(outputId = "c6_out")
+#'   )
 #' )
 #'
+#' server <- function(input, output, session) {
+#'   observeEvent(input$c6_choices, ignoreNULL = FALSE, {
+#'     updateOptionalSelectInput(
+#'       session = session,
+#'       inputId = "c6",
+#'       choices = input$c6_choices,
+#'       selected = input$c6_choices
+#'     )
+#'   })
+#'
+#'   output$c1_out <- renderPrint(input$c1)
+#'   output$c2_out <- renderPrint(input$c2)
+#'   output$c3_out <- renderPrint(input$c3)
+#'   output$c4_out <- renderPrint(input$c4)
+#'   output$c5_out <- renderPrint(input$c5)
+#'   output$c6_out <- renderPrint(input$c6)
+#' }
+#'
 #' if (interactive()) {
-#'   shinyApp(app$ui, app$server)
+#'   shinyApp(ui, server)
 #' }
 #'
 optionalSelectInput <- function(inputId, # nolint
@@ -236,7 +234,7 @@ optionalSelectInput <- function(inputId, # nolint
   )
 
   if (!is.null(label_help)) {
-    ui_picker[[3]] <- append(ui_picker[[3]], list(div(class = "label-help", label_help)), after = 1)
+    ui_picker[[3]] <- append(ui_picker[[3]], list(tags$div(class = "label-help", label_help)), after = 1)
   }
 
   ui_fixed <- tags$div(
@@ -257,8 +255,8 @@ optionalSelectInput <- function(inputId, # nolint
     label_help
   )
 
-  div(
-    include_css_files(pattern = "picker_input"),
+  tags$div(
+    optional_select_input_deps(),
 
     # when selected values in ui_picker change
     # then update ui_fixed - specifically, update '{id}_selected_text' element
@@ -294,7 +292,7 @@ optionalSelectInput <- function(inputId, # nolint
       )
       tags$script(js)
     },
-    div(ui_picker, ui_fixed)
+    tags$div(ui_picker, ui_fixed)
   )
 }
 
@@ -464,14 +462,14 @@ extract_raw_choices <- function(choices, sep) {
 
 #' if min or max are `NA` then the slider widget will be hidden
 #'
-#' @description `r lifecycle::badge("stable")`
+#' @description `r lifecycle::badge("stable")`\cr
 #' Hidden input widgets are useful to have the `input[[inputId]]` variable
 #' on available in the server function but no corresponding visual clutter from
 #' input widgets that provide only a single choice.
 #'
 #' @inheritParams shiny::sliderInput
-#' @param label_help (`shiny.tag`, optional)\cr
-#'  an object of class `shiny.tag`. E.g. an object returned by [shiny::helpText()]
+#' @param label_help (`shiny.tag`) optional\cr
+#'  object of class `shiny.tag`, e.g. an object returned by [shiny::helpText()]
 #' @param ... optional arguments to `sliderInput`
 #'
 #' @return (`shiny.tag`) HTML tag with `sliderInput` widget.
@@ -512,7 +510,7 @@ optionalSliderInput <- function(inputId, label, min, max, value, label_help = NU
   slider <- sliderInput(inputId, label, min, max, value, ...)
 
   if (!is.null(label_help)) {
-    slider[[3]] <- append(slider[[3]], list(div(class = "label-help", label_help)), after = 1)
+    slider[[3]] <- append(slider[[3]], list(tags$div(class = "label-help", label_help)), after = 1)
   }
 
   if (hide) {
@@ -522,8 +520,8 @@ optionalSliderInput <- function(inputId, label, min, max, value, label_help = NU
   }
 }
 
-#' For `teal` modules we parameterize an \code{optionalSliderInput} with one argument
-#' \code{value_min_max}
+#' For `teal` modules we parameterize an `optionalSliderInput` with one argument
+#' `value_min_max`
 #'
 #' @description `r lifecycle::badge("stable")`
 #' The [optionalSliderInput()] function needs three arguments to determine
@@ -571,7 +569,7 @@ optionalSliderInputValMinMax <- function(inputId, label, value_min_max, label_he
   slider <- optionalSliderInput(inputId, label, vals$min, vals$max, vals$value, ...)
 
   if (!is.null(label_help)) {
-    slider[[3]] <- append(slider[[3]], list(div(class = "label-help", label_help)), after = 1)
+    slider[[3]] <- append(slider[[3]], list(tags$div(class = "label-help", label_help)), after = 1)
   }
   return(slider)
 }
@@ -580,7 +578,7 @@ optionalSliderInputValMinMax <- function(inputId, label, value_min_max, label_he
 #'
 #' @param choices (`list` or `vector`)\cr
 #'  select choices
-#' @param values (optional)\cr
+#' @param values optional\cr
 #'  choices subset for which labels should be extracted, `NULL` for all choices.
 #'
 #' @return (`character`) vector with labels

@@ -1,19 +1,22 @@
-#' Maps the `lengthMenu`selected value property of `DT::datatable` to a Shiny variable.
+#' Map `lenghtMenu` property
 #'
-#' @description `r lifecycle::badge("stable")`
-#' @param dt_name \code{ns()} of `inputId` of the `DT::datatable`
-#' @param dt_rows \code{ns()} of `inputId` of the variable that holds the current selected value of `lengthMenu`
+#' @description `r lifecycle::badge("stable")`\cr
+#' Maps the `lengthMenu` selected value property of `DT::datatable` to a `shiny` variable.
+#' @param dt_name `ns()` of `inputId` of the `DT::datatable`
+#' @param dt_rows `ns()` of `inputId` of the variable that holds the current selected value of `lengthMenu`
 #'
 #' @name get_dt_rows
 #'
 #' @return (`shiny::tagList`) A `shiny tagList`.
 #'
-#' @examples
+#' @examplesIf require("DT")
 #' library(shiny)
+#' library(DT)
+#'
 #' ui <- function(id) {
 #'   ns <- NS(id)
 #'   tagList(
-#'     DT::DTOutput(ns("data_table")),
+#'     DTOutput(ns("data_table")),
 #'     get_dt_rows(ns("data_table"), ns("dt_rows"))
 #'   )
 #' }
@@ -21,7 +24,7 @@
 #' # use the input$dt_rows in the Shiny Server function
 #' server <- function(id) {
 #'   moduleServer(id, function(input, output, session) {
-#'     output$data_table <- DT::renderDataTable(
+#'     output$data_table <- renderDataTable(
 #'       {
 #'         iris
 #'       },

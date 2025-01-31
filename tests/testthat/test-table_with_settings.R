@@ -1,7 +1,7 @@
 table_r <- shiny::reactive({
   l <- rtables::basic_table() %>%
     rtables::split_cols_by("Species") %>%
-    rtables::analyze(c("Sepal.Length"))
+    rtables::analyze("Sepal.Length")
   rtables::build_table(l, iris)
 })
 
@@ -110,20 +110,17 @@ testthat::test_that("type_download_srv_table: downloading different output types
 })
 
 testthat::test_that("type_download_srv_table: pagination, lpp to small", {
-  testthat::expect_error(
-    shiny::testServer(
-      teal.widgets:::type_download_srv_table,
-      args = list(id = "tws", table_reactive = table_r),
-      expr = {
-        for (down_type in c(".txt", ".pdf")) {
-          session$setInputs(`pagination_switch` = TRUE)
-          session$setInputs(`lpp` = 1)
-          session$setInputs(`file_format` = down_type)
-          testthat::expect_true(file.exists(output$data_download))
-        }
+  shiny::testServer(
+    teal.widgets:::type_download_srv_table,
+    args = list(id = "tws", table_reactive = table_r),
+    expr = {
+      for (down_type in c(".txt", ".pdf")) {
+        session$setInputs(`pagination_switch` = TRUE)
+        session$setInputs(`lpp` = 1)
+        session$setInputs(`file_format` = down_type)
+        testthat::expect_error(output$data_download, "Lines of repeated context")
       }
-    ),
-    "Lines of repeated context"
+    }
   )
 })
 

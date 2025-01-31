@@ -1,3 +1,15 @@
+#' @keywords internal
+#' @noRd
+verbatim_popup_deps <- function() {
+  htmltools::htmlDependency(
+    name = "teal-widgets-verbatim-popup",
+    version = utils::packageVersion("teal.widgets"),
+    package = "teal.widgets",
+    src = "verbatim-popup",
+    script = "verbatim-popup.js"
+  )
+}
+
 #' A `shiny` module that pops up verbatim text.
 #' @name verbatim_popup
 #' @description `r lifecycle::badge("experimental")`
@@ -13,7 +25,9 @@
 #' @export
 #'
 #' @examples
-#' ui <- shiny::fluidPage(verbatim_popup_ui("my_id", button_label = "Open popup"))
+#' library(shiny)
+#'
+#' ui <- fluidPage(verbatim_popup_ui("my_id", button_label = "Open popup"))
 #' srv <- function(input, output) {
 #'   verbatim_popup_srv(
 #'     "my_id",
@@ -22,7 +36,7 @@
 #'     style = TRUE
 #'   )
 #' }
-#' if (interactive()) shiny::shinyApp(ui, srv)
+#' if (interactive()) shinyApp(ui, srv)
 #'
 verbatim_popup_ui <- function(id, button_label, type = c("button", "link"), ...) {
   checkmate::assert_string(id)
@@ -40,9 +54,7 @@ verbatim_popup_ui <- function(id, button_label, type = c("button", "link"), ...)
   )
 
   shiny::tagList(
-    shiny::singleton(
-      shiny::tags$head(shiny::includeScript(system.file("js/verbatim_popup.js", package = "teal.widgets")))
-    ),
+    verbatim_popup_deps(),
     shinyjs::useShinyjs(),
     do.call(ui_function, c(ui_args, list(...)))
   )
@@ -116,9 +128,9 @@ button_click_observer <- function(click_event,
       shiny::showModal(
         shiny::modalDialog(
           shiny::tagList(
-            include_css_files(pattern = "verbatim_popup"),
-            shiny::tags$div(
+            tags$div(
               class = "mb-4",
+              style = "margin-bottom: 1rem;",
               shiny::actionButton(
                 paste0(copy_button_id, 1),
                 "Copy to Clipboard",
@@ -126,7 +138,7 @@ button_click_observer <- function(click_event,
               ),
               shiny::modalButton("Dismiss")
             ),
-            shiny::tags$pre(id = copied_area_id, modal_content()),
+            tags$pre(id = copied_area_id, modal_content()),
           ),
           title = modal_title,
           footer = shiny::tagList(
