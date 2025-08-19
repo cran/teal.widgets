@@ -6,8 +6,8 @@ plot_with_settings_deps <- function() {
     version = utils::packageVersion("teal.widgets"),
     package = "teal.widgets",
     src = "plot-with-settings",
-    script = "plot-with-settings.js",
-    stylesheet = "plot-with-settings.css"
+    stylesheet = "plot-with-settings.css",
+    script = "plot-with-settings.js"
   )
 }
 
@@ -19,32 +19,41 @@ plot_with_settings_ui <- function(id) {
 
   ns <- NS(id)
 
-  tagList(
+  tags$div(
     plot_with_settings_deps(),
-    tags$div(
+    shinyjs::useShinyjs(),
+    bslib::card(
       id = ns("plot-with-settings"),
+      full_screen = TRUE,
       tags$div(
-        class = "plot-settings-buttons",
-        type_download_ui(ns("downbutton")),
-        actionButton(
-          ns("expand"),
-          label = character(0),
-          icon = icon("up-right-and-down-left-from-center"),
-          class = "btn-sm"
+        tags$div(
+          class = "teal-widgets settings-buttons",
+          bslib::tooltip(
+            trigger = tags$div(
+              bslib::popover(
+                id = ns("expbut"),
+                trigger = icon("maximize"),
+                uiOutput(ns("slider_ui")),
+                uiOutput(ns("width_warning"))
+              )
+            ),
+            options = list(trigger = "hover"),
+            class = "resize-button",
+            "Resize"
+          ),
+          bslib::tooltip(
+            trigger = tags$div(type_download_ui(ns("downbutton"))),
+            options = list(trigger = "hover"),
+            class = "download-button",
+            "Download"
+          )
         ),
-        shinyWidgets::dropdownButton(
-          circle = FALSE,
-          size = "sm",
-          icon = icon("maximize"),
-          inline = TRUE,
-          right = TRUE,
-          label = "",
-          inputId = ns("expbut"),
-          uiOutput(ns("slider_ui")),
-          uiOutput(ns("width_warning"))
+        tags$div(
+          id = ns("plot-out-main"),
+          class = "teal-widgets plot-content",
+          uiOutput(ns("plot_out_main"))
         )
-      ),
-      uiOutput(ns("plot_out_main"), class = "plot_out_container", width = "100%")
+      )
     )
   )
 }
@@ -52,7 +61,7 @@ plot_with_settings_ui <- function(id) {
 #' Plot-with-settings module
 #'
 #' @rdname plot_with_settings
-#' @description `r lifecycle::badge("stable")`\cr
+#' @description
 #' Universal module for plots with settings for height, width, and download.
 #'
 #' @export
@@ -65,29 +74,27 @@ plot_with_settings_ui <- function(id) {
 #'  Take into account that simple functions are less efficient than reactive, as not catching the result.
 #' @param height (`numeric`) optional\cr
 #'  vector with three elements c(VAL, MIN, MAX), where VAL is the starting value of the slider in
-#'  the main and modal plot display. The value in the modal display is taken from the value of the
-#'  slider in the main plot display.
+#'  the main and expanded plot display.
 #' @param width (`numeric`) optional\cr
 #'  vector with three elements `c(VAL, MIN, MAX)`, where VAL is the starting value of the slider in
-#'  the main and modal plot display; `NULL` for default display. The value in the modal
-#'  display is taken from the value of the slider in the main plot display.
+#'  the main and expanded plot display; `NULL` for default display.
 #' @param show_hide_signal optional, (`reactive logical` a mechanism to allow modules which call this
 #'     module to show/hide the plot_with_settings UI)
 #' @param brushing (`logical`) optional\cr
-#'  mechanism to enable / disable brushing on the main plot (in particular: not the one displayed
-#'  in modal). All the brushing data is stored as a reactive object in the `"brush"` element of
+#'  mechanism to enable / disable brushing on the main plot.
+#' All the brushing data is stored as a reactive object in the `"brush"` element of
 #'  returned list. See the example for details.
 #' @param clicking (`logical`)\cr
-#'  a mechanism to enable / disable clicking on data points on the main plot (in particular: not the
-#'  one displayed in modal). All the clicking data is stored as a reactive object in the `"click"`
+#'  a mechanism to enable / disable clicking on data points on the main plot.
+#' All the clicking data is stored as a reactive object in the `"click"`
 #'  element of returned list. See the example for details.
 #' @param dblclicking (`logical`) optional\cr
-#'  mechanism to enable / disable double-clicking on data points on the main plot (in particular:
-#'  not the one displayed in modal). All the double clicking data is stored as a reactive object in
+#'  mechanism to enable / disable double-clicking on data points on the main plot.
+#' All the double clicking data is stored as a reactive object in the
 #'  the `"dblclick"` element of returned list. See the example for details.
 #' @param hovering (`logical(1)`) optional\cr
-#'  mechanism to enable / disable hovering over data points on the main plot (in particular: not
-#'  the one displayed in modal). All the hovering data is stored as a reactive object in the
+#'  mechanism to enable / disable hovering over data points on the main plot.
+#' All the hovering data is stored as a reactive object in the
 #' `"hover"` element of returned list. See the example for details.
 #' @param graph_align (`character(1)`) optional,\cr
 #'  one of `"left"` (default), `"center"`, `"right"` or `"justify"`. The alignment of the graph on
@@ -104,7 +111,7 @@ plot_with_settings_ui <- function(id) {
 #' library(shiny)
 #' library(ggplot2)
 #'
-#' ui <- fluidPage(
+#' ui <- bslib::page_fluid(
 #'   plot_with_settings_ui(
 #'     id = "plot_with_settings"
 #'   )
@@ -131,7 +138,7 @@ plot_with_settings_ui <- function(id) {
 #' # Example using a function as input to plot_r
 #' library(lattice)
 #'
-#' ui <- fluidPage(
+#' ui <- bslib::page_fluid(
 #'   radioButtons("download_option", "Select the Option", list("ggplot", "trellis", "grob", "base")),
 #'   plot_with_settings_ui(
 #'     id = "plot_with_settings"
@@ -171,7 +178,7 @@ plot_with_settings_ui <- function(id) {
 #' }
 #'
 #' # Example with brushing/hovering/clicking/double-clicking
-#' ui <- fluidPage(
+#' ui <- bslib::page_fluid(
 #'   plot_with_settings_ui(
 #'     id = "plot_with_settings"
 #'   ),
@@ -212,7 +219,7 @@ plot_with_settings_ui <- function(id) {
 #' # Example which allows module to be hidden/shown
 #' library("shinyjs")
 #'
-#' ui <- fluidPage(
+#' ui <- bslib::page_fluid(
 #'   useShinyjs(),
 #'   actionButton("button", "Show/Hide"),
 #'   plot_with_settings_ui(
@@ -276,10 +283,9 @@ plot_with_settings_srv <- function(id,
     ns <- session$ns
     shinyjs::runjs(
       sprintf(
-        'establishPlotResizing("%s", "%s", "%s");',
-        ns("plot_main"), # graph parent id
-        ns("flex_width"), # session input$ variable name
-        ns("plot_modal_width") # session input$ variable name
+        'establishPlotResizing("%s", "%s");',
+        ns("plot-out-main"), # graph parent id
+        ns("flex_width") # session input$ variable name
       )
     )
     default_w <- function() session$clientData[[paste0("output_", ns("plot_main_width"))]]
@@ -297,13 +303,6 @@ plot_with_settings_srv <- function(id,
         once = TRUE,
         ignoreNULL = TRUE
       )
-
-      observeEvent(delayed_flex_width(), {
-        if (delayed_flex_width() > 0 && !isFALSE(input$width_resize_switch)) {
-          default_slider_width(delayed_flex_width() * c(1, 0.5, 2.8))
-          updateSliderInput(session, inputId = "width", value = delayed_flex_width())
-        }
-      })
     }
 
     plot_type <- reactive({
@@ -330,6 +329,7 @@ plot_with_settings_srv <- function(id,
     })
 
     output$slider_ui <- renderUI({
+      req(default_slider_width())
       tags$div(
         optionalSliderInputValMinMax(
           inputId = ns("height"),
@@ -340,14 +340,10 @@ plot_with_settings_srv <- function(id,
           round = TRUE
         ),
         tags$b("Plot width"),
-        shinyWidgets::switchInput(
-          inputId = ns("width_resize_switch"),
-          onLabel = "ON",
-          offLabel = "OFF",
-          label = "Auto width",
-          value = `if`(is.null(width), TRUE, FALSE),
-          size = "mini",
-          labelWidth = "80px"
+        bslib::input_switch(
+          id = ns("width_resize_switch"),
+          label = "Automatic",
+          value = `if`(is.null(width), TRUE, FALSE)
         ),
         optionalSliderInputValMinMax(
           inputId = ns("width"),
@@ -361,7 +357,7 @@ plot_with_settings_srv <- function(id,
     })
 
     observeEvent(input$width_resize_switch | delayed_flex_width(), {
-      if (length(input$width_resize_switch) && input$width_resize_switch) {
+      if (!isFALSE(input$width_resize_switch)) {
         shinyjs::disable("width")
         updateSliderInput(session, inputId = "width", value = delayed_flex_width())
       } else {
@@ -397,8 +393,8 @@ plot_with_settings_srv <- function(id,
     )
     output$plot_main <- renderPlot(
       apply_plot_modifications(
-        plot_obj = plot_suppress(plot_r()),
-        plot_type = plot_suppress(plot_type()),
+        plot_obj = plot_r(),
+        plot_type = plot_type(),
         dblclicking = dblclicking,
         ranges = ranges
       ),
@@ -407,25 +403,14 @@ plot_with_settings_srv <- function(id,
       width = p_width
     )
 
-    output$plot_modal <- renderPlot(
-      apply_plot_modifications(
-        plot_obj = plot_suppress(plot_r()),
-        plot_type = plot_suppress(plot_type()),
-        dblclicking = dblclicking,
-        ranges = ranges
-      ),
-      res = get_plot_dpi(),
-      height = reactive(input$height_in_modal),
-      width = reactive(input$width_in_modal)
-    )
-
     output$plot_out_main <- renderUI({
-      req(plot_suppress(plot_r()))
+      req(plot_r())
       tags$div(
         align = graph_align,
         plotOutput(
           ns("plot_main"),
           height = "100%",
+          width = p_width(),
           brush = `if`(brushing, brushOpts(ns("plot_brush"), resetOnNew = FALSE), NULL),
           click = `if`(clicking, clickOpts(ns("plot_click")), NULL),
           dblclick = `if`(dblclicking, dblclickOpts(ns("plot_dblclick")), NULL),
@@ -456,97 +441,32 @@ plot_with_settings_srv <- function(id,
       default_h = default_h
     )
 
-    output$plot_out_modal <- renderUI({
-      plotOutput(ns("plot_modal"), height = input$height_in_modal, width = input$width_in_modal)
-    })
-
-    observeEvent(input$expand, {
-      showModal(
-        tags$div(
-          class = "plot-modal",
-          modalDialog(
-            easyClose = TRUE,
-            tags$div(
-              class = "plot-modal-sliders",
-              optionalSliderInputValMinMax(
-                inputId = ns("height_in_modal"),
-                label = "Plot height",
-                value_min_max = round(c(p_height(), height[2:3])),
-                ticks = FALSE,
-                step = 1L,
-                round = TRUE
-              ),
-              optionalSliderInputValMinMax(
-                inputId = ns("width_in_modal"),
-                label = "Plot width",
-                value_min_max = round(c(
-                  ifelse(
-                    is.null(input$width) || !isFALSE(input$width_resize_switch),
-                    ifelse(
-                      is.null(input$plot_modal_width) || input$plot_modal_width > default_slider_width()[3],
-                      default_slider_width()[1],
-                      input$plot_modal_width
-                    ),
-                    input$width
-                  ),
-                  default_slider_width()[2:3]
-                )),
-                ticks = FALSE,
-                step = 1L,
-                round = TRUE
-              )
-            ),
-            tags$div(
-              class = "float-right",
-              type_download_ui(ns("modal_downbutton"))
-            ),
-            tags$div(
-              align = "center",
-              uiOutput(ns("plot_out_modal"), class = "plot_out_container")
-            )
-          )
-        )
-      )
-    })
-
-    type_download_srv(
-      id = "modal_downbutton",
-      plot_reactive = plot_r,
-      plot_type = plot_type,
-      plot_w = reactive(input$width_in_modal),
-      default_w = default_w,
-      plot_h = reactive(input$height_in_modal),
-      default_h = default_h
-    )
-
-    return(
-      list(
-        brush = reactive({
-          # refresh brush data on the main plot size change
-          input$height
-          input$width
-          input$plot_brush
-        }),
-        click = reactive({
-          # refresh click data on the main plot size change
-          input$height
-          input$width
-          input$plot_click
-        }),
-        dblclick = reactive({
-          # refresh double click data on the main plot size change
-          input$height
-          input$width
-          input$plot_dblclick
-        }),
-        hover = reactive({
-          # refresh hover data on the main plot size change
-          input$height
-          input$width
-          input$plot_hover
-        }),
-        dim = reactive(c(p_width(), p_height()))
-      )
+    list(
+      brush = reactive({
+        # refresh brush data on the main plot size change
+        input$height
+        input$width
+        input$plot_brush
+      }),
+      click = reactive({
+        # refresh click data on the main plot size change
+        input$height
+        input$width
+        input$plot_click
+      }),
+      dblclick = reactive({
+        # refresh double click data on the main plot size change
+        input$height
+        input$width
+        input$plot_dblclick
+      }),
+      hover = reactive({
+        # refresh hover data on the main plot size change
+        input$height
+        input$width
+        input$plot_hover
+      }),
+      dim = reactive(c(p_width(), p_height()))
     )
   })
 }
@@ -554,14 +474,8 @@ plot_with_settings_srv <- function(id,
 #' @keywords internal
 type_download_ui <- function(id) {
   ns <- NS(id)
-  shinyWidgets::dropdownButton(
-    circle = FALSE,
-    size = "sm",
-    icon = icon("download"),
-    inline = TRUE,
-    right = TRUE,
-    label = "",
-    inputId = ns("downl"),
+  bslib::popover(
+    icon("download"),
     tags$div(
       radioButtons(ns("file_format"),
         label = "File type",
@@ -610,7 +524,7 @@ type_download_srv <- function(id, plot_reactive, plot_type, plot_w, default_w, p
 
 #' Clean brushed points
 #'
-#' @description `r lifecycle::badge("stable")`\cr
+#' @description
 #' Cleans and organizes output to account for NAs and remove empty rows. Wrapper around `shiny::brushedPoints`.
 #' @param data (`data.frame`)\cr
 #'  A data.frame from which to select rows.

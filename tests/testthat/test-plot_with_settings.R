@@ -455,29 +455,6 @@ testthat::test_that("plot_with_settings_srv expand no error", {
   )
 })
 
-testthat::test_that("plot_with_settings_srv set dimensions and download a png file from modal", {
-  testthat::skip_if_not_installed("png")
-
-  plot_with_settings_args[["plot_r"]] <- function() plot(1)
-  shiny::testServer(
-    teal.widgets:::plot_with_settings_srv,
-    args = plot_with_settings_args,
-    expr = {
-      session$setInputs(`width_in_modal` = 400L)
-      session$setInputs(`height_in_modal` = 450L)
-      testthat::expect_identical(
-        c(output$plot_modal$width, output$plot_modal$height),
-        c(400L, 450L)
-      )
-      session$setInputs(`modal_downbutton-file_format` = "png")
-      session$setInputs(`modal_downbutton-data_download` = 1)
-      testthat::expect_identical(
-        attr(png::readPNG(output$`modal_downbutton-data_download`, info = TRUE), "info")$dim,
-        c(400L, 450L)
-      )
-    }
-  )
-})
 
 testthat::test_that("plot_with_settings_srv returns the click ggplot2 functionalities metadata", {
   plot_with_settings_args$plot_r <- function() plot(1)
@@ -496,17 +473,4 @@ testthat::test_that("plot_with_settings_srv returns the click ggplot2 functional
       testthat::expect_identical(session$returned$dblclick(), "SOMETHING")
     }
   )
-})
-
-testthat::test_that("plot_with_settings_srv and plot_type reactive types", {
-  for (p in seq_along(plot_funs)) {
-    plot_with_settings_args[["plot_r"]] <- plot_funs[[p]]
-    shiny::testServer(
-      teal.widgets:::plot_with_settings_srv,
-      args = plot_with_settings_args,
-      expr = {
-        plot_suppress(testthat::expect_identical(plot_type(), plot_types[[p]]()))
-      }
-    )
-  }
 })

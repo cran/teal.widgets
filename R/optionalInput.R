@@ -1,18 +1,6 @@
-#' @keywords internal
-#' @noRd
-optional_select_input_deps <- function() {
-  htmltools::htmlDependency(
-    name = "teal-widgets-optional-select-input",
-    version = utils::packageVersion("teal.widgets"),
-    package = "teal.widgets",
-    src = "optional-select-input",
-    stylesheet = "optional-select-input.css"
-  )
-}
-
 #' Wrapper for `pickerInput`
 #'
-#' @description `r lifecycle::badge("stable")`
+#' @description
 #' Wrapper for [shinyWidgets::pickerInput()] with additional features.
 #' When `fixed = TRUE` or when the number of `choices` is less or equal to 1 (see `fixed_on_single`),
 #' the `pickerInput` widget is hidden and non-interactive widget will be displayed
@@ -46,26 +34,17 @@ optional_select_input_deps <- function() {
 #' @examples
 #' library(shiny)
 #'
-#' # Create a minimal example data frame
-#' data <- data.frame(
-#'   AGE = c(25, 30, 40, 35, 28),
-#'   SEX = c("Male", "Female", "Male", "Female", "Male"),
-#'   PARAMCD = c("Val1", "Val2", "Val3", "Val4", "Val5"),
-#'   PARAM = c("Param1", "Param2", "Param3", "Param4", "Param5"),
-#'   AVISIT = c("Visit1", "Visit2", "Visit3", "Visit4", "Visit5"),
-#'   stringsAsFactors = TRUE
-#' )
-#'
 #' ui_grid <- function(...) {
-#'   fluidPage(
-#'     fluidRow(
-#'       lapply(list(...), function(x) column(4, wellPanel(x)))
+#'   bslib::page_fluid(
+#'     bslib::layout_columns(
+#'       col_widths = c(4, 4, 4),
+#'       ...
 #'     )
 #'   )
 #' }
 #'
 #' ui <- ui_grid(
-#'   tags$div(
+#'   wellPanel(
 #'     optionalSelectInput(
 #'       inputId = "c1",
 #'       label = "Fixed choices",
@@ -75,7 +54,7 @@ optional_select_input_deps <- function() {
 #'     ),
 #'     verbatimTextOutput(outputId = "c1_out")
 #'   ),
-#'   tags$div(
+#'   wellPanel(
 #'     optionalSelectInput(
 #'       inputId = "c2",
 #'       label = "Single choice",
@@ -84,7 +63,7 @@ optional_select_input_deps <- function() {
 #'     ),
 #'     verbatimTextOutput(outputId = "c2_out")
 #'   ),
-#'   tags$div(
+#'   wellPanel(
 #'     optionalSelectInput(
 #'       inputId = "c3",
 #'       label = "NULL choices",
@@ -92,7 +71,7 @@ optional_select_input_deps <- function() {
 #'     ),
 #'     verbatimTextOutput(outputId = "c3_out")
 #'   ),
-#'   tags$div(
+#'   wellPanel(
 #'     optionalSelectInput(
 #'       inputId = "c4",
 #'       label = "Default",
@@ -101,7 +80,7 @@ optional_select_input_deps <- function() {
 #'     ),
 #'     verbatimTextOutput(outputId = "c4_out")
 #'   ),
-#'   tags$div(
+#'   wellPanel(
 #'     optionalSelectInput(
 #'       inputId = "c5",
 #'       label = "Named vector",
@@ -110,7 +89,7 @@ optional_select_input_deps <- function() {
 #'     ),
 #'     verbatimTextOutput(outputId = "c5_out")
 #'   ),
-#'   tags$div(
+#'   wellPanel(
 #'     selectInput(
 #'       inputId = "c6_choices", label = "Update choices", choices = letters, multiple = TRUE
 #'     ),
@@ -191,14 +170,11 @@ optionalSelectInput <- function(inputId, # nolint
   default_options <- list(
     "actions-box" = multiple,
     "none-selected-text" = "- Nothing selected -",
+    "allow-clear" = !multiple,
     "max-options" = ifelse(multiple, Inf, 1),
     "show-subtext" = TRUE,
     "live-search" = ifelse(length(choices) > 10, TRUE, FALSE)
   )
-
-  # if called outside the fluidPage then will assume bs 3
-  bs_version <- get_bs_version()
-  if (isTRUE(bs_version != "3")) default_options[["style"]] <- "btn-outline-secondary"
 
   options <- if (!identical(options, list())) {
     c(options, default_options[setdiff(names(default_options), names(options))])
@@ -215,6 +191,11 @@ optionalSelectInput <- function(inputId, # nolint
 
   raw_choices <- extract_raw_choices(choices, attr(choices, "sep"))
   raw_selected <- extract_raw_choices(selected, attr(choices, "sep"))
+
+  # Making sure the default dropdown popup can be displayed in the whole body, even outside the sidebars.
+  if (is.null(options$container)) {
+    options$container <- "body"
+  }
 
   ui_picker <- tags$div(
     id = paste0(inputId, "_input"),
@@ -256,8 +237,6 @@ optionalSelectInput <- function(inputId, # nolint
   )
 
   tags$div(
-    optional_select_input_deps(),
-
     # when selected values in ui_picker change
     # then update ui_fixed - specifically, update '{id}_selected_text' element
     tags$script(
@@ -314,7 +293,10 @@ updateOptionalSelectInput <- function(session, # nolint
     label = label,
     selected = as.character(raw_selected),
     choices = raw_choices,
-    choicesOpt = picker_options(choices)
+    choicesOpt = picker_options(choices),
+    options = list(
+      `live-search` = ifelse(length(raw_choices) > 10, TRUE, FALSE)
+    )
   )
 
   invisible(NULL)
@@ -360,7 +342,7 @@ variable_type_icons <- function(var_type) {
     }
   ))
 
-  return(res)
+  res
 }
 
 #' Optional content for `optionalSelectInput`
@@ -379,32 +361,32 @@ variable_type_icons <- function(var_type) {
 #'
 picker_options_content <- function(var_name, var_label, var_type) {
   if (length(var_name) == 0) {
-    return(character(0))
-  }
-  if (length(var_type) == 0 && length(var_label) == 0) {
-    return(var_name)
-  }
-  checkmate::assert_character(var_name, min.len = 1, any.missing = FALSE)
-  stopifnot(
-    identical(var_type, character(0)) || length(var_type) == length(var_name),
-    identical(var_label, character(0)) || length(var_label) == length(var_name)
-  )
-
-  var_icon <- variable_type_icons(var_type)
-
-  res <- trimws(paste(
-    var_icon,
-    var_name,
-    vapply(
-      var_label,
-      function(x) {
-        ifelse(x == "", "", toString(tags$small(x, class = "text-muted")))
-      },
-      character(1)
+    res <- character(0)
+  } else if (length(var_type) == 0 && length(var_label) == 0) {
+    res <- var_name
+  } else {
+    checkmate::assert_character(var_name, min.len = 1, any.missing = FALSE)
+    stopifnot(
+      identical(var_type, character(0)) || length(var_type) == length(var_name),
+      identical(var_label, character(0)) || length(var_label) == length(var_name)
     )
-  ))
 
-  return(res)
+    var_icon <- variable_type_icons(var_type)
+
+    res <- trimws(paste(
+      var_icon,
+      var_name,
+      vapply(
+        var_label,
+        function(x) {
+          ifelse(x == "", "", toString(tags$small(x, class = "text-muted")))
+        },
+        character(1)
+      )
+    ))
+  }
+
+  res
 }
 
 #' Create `choicesOpt` for `pickerInput`
@@ -418,27 +400,24 @@ picker_options_content <- function(var_name, var_label, var_type) {
 picker_options <- function(choices) {
   if (inherits(choices, "choices_labeled")) {
     raw_choices <- extract_raw_choices(choices, sep = attr(choices, "sep"))
-    return(
-      list(
-        content = picker_options_content(
-          var_name  = raw_choices,
-          var_label = extract_choices_labels(choices),
-          var_type  = if (is.null(attr(choices, "types"))) character(0) else attr(choices, "types")
-        )
+    res <- list(
+      content = picker_options_content(
+        var_name  = raw_choices,
+        var_label = extract_choices_labels(choices),
+        var_type  = if (is.null(attr(choices, "types"))) character(0) else attr(choices, "types")
       )
     )
   } else if (all(vapply(choices, inherits, logical(1), "choices_labeled"))) {
     choices <- unlist(unname(choices))
-    return(
-      list(content = picker_options_content(
-        var_name  = choices,
-        var_label = extract_choices_labels(choices),
-        var_type  = if (is.null(attr(choices, "types"))) character(0) else attr(choices, "types")
-      ))
-    )
+    res <- list(content = picker_options_content(
+      var_name  = choices,
+      var_label = extract_choices_labels(choices),
+      var_type  = if (is.null(attr(choices, "types"))) character(0) else attr(choices, "types")
+    ))
   } else {
-    return(NULL)
+    res <- NULL
   }
+  res
 }
 
 #' Extract raw values from choices
@@ -460,9 +439,11 @@ extract_raw_choices <- function(choices, sep) {
   }
 }
 
+#' Optional Slider Input Widget
+#'
 #' if min or max are `NA` then the slider widget will be hidden
 #'
-#' @description `r lifecycle::badge("stable")`\cr
+#' @description
 #' Hidden input widgets are useful to have the `input[[inputId]]` variable
 #' on available in the server function but no corresponding visual clutter from
 #' input widgets that provide only a single choice.
@@ -477,7 +458,14 @@ extract_raw_choices <- function(choices, sep) {
 #' @export
 #'
 #' @examples
-#' optionalSliderInput("a", "b", 0, 1, 0.2)
+#' ui <- bslib::page_fluid(
+#'   shinyjs::useShinyjs(),
+#'   optionalSliderInput("s", "shown", 0, 1, 0.2),
+#'   optionalSliderInput("h", "hidden", 0, NA, 1),
+#' )
+#' if (interactive()) {
+#'   shiny::shinyApp(ui, function(input, output) {})
+#' }
 optionalSliderInput <- function(inputId, label, min, max, value, label_help = NULL, ...) { # nolint
   checkmate::assert_number(min, na.ok = TRUE)
   checkmate::assert_number(max, na.ok = TRUE)
@@ -520,10 +508,12 @@ optionalSliderInput <- function(inputId, label, min, max, value, label_help = NU
   }
 }
 
+#' Optional Slider Input with minimal and maximal values
+#'
 #' For `teal` modules we parameterize an `optionalSliderInput` with one argument
 #' `value_min_max`
 #'
-#' @description `r lifecycle::badge("stable")`
+#' @description
 #' The [optionalSliderInput()] function needs three arguments to determine
 #' whether to hide the `sliderInput` widget or not. For `teal` modules we specify an
 #' optional slider input with one argument here called `value_min_max`.
@@ -541,8 +531,14 @@ optionalSliderInput <- function(inputId, label, min, max, value, label_help = NU
 #'
 #' @examples
 #'
-#' optionalSliderInputValMinMax("a", "b", 1)
-#' optionalSliderInputValMinMax("a", "b", c(3, 1, 5))
+#' ui <- bslib::page_fluid(
+#'   shinyjs::useShinyjs(),
+#'   optionalSliderInputValMinMax("a1", "b1", 1), # Hidden
+#'   optionalSliderInputValMinMax("a2", "b2", c(3, 1, 5)) # Shown
+#' )
+#' if (interactive()) {
+#'   shiny::shinyApp(ui, function(input, output) {})
+#' }
 optionalSliderInputValMinMax <- function(inputId, label, value_min_max, label_help = NULL, ...) { # nolint
   checkmate::assert(
     checkmate::check_numeric(
@@ -571,7 +567,7 @@ optionalSliderInputValMinMax <- function(inputId, label, value_min_max, label_he
   if (!is.null(label_help)) {
     slider[[3]] <- append(slider[[3]], list(tags$div(class = "label-help", label_help)), after = 1)
   }
-  return(slider)
+  slider
 }
 
 #' Extract labels from choices basing on attributes and names
@@ -597,5 +593,5 @@ extract_choices_labels <- function(choices, values = NULL) {
     res <- res[vapply(values, function(val) which(val == choices), numeric(1))]
   }
 
-  return(res)
+  res
 }

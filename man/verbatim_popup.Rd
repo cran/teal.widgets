@@ -40,14 +40,13 @@ when the flag is \code{TRUE} and enabled otherwise.}
 the UI function returns a \code{shiny.tag.list} object
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 This module consists of a button that once clicked pops up a
 modal window with verbatim-styled text.
 }
 \examples{
 library(shiny)
 
-ui <- fluidPage(verbatim_popup_ui("my_id", button_label = "Open popup"))
+ui <- bslib::page_fluid(verbatim_popup_ui("my_id", button_label = "Open popup"))
 srv <- function(input, output) {
   verbatim_popup_srv(
     "my_id",

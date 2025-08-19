@@ -1,7 +1,7 @@
 Package: teal.widgets
 Title: 'shiny' Widgets for 'teal' Applications
-Version: 0.4.3
-Date: 2025-01-31
+Version: 0.5.0
+Date: 2025-08-19
 Authors@R: c(
     person("Dawid", "Kaledkowski", , "dawid.kaledkowski@roche.com", role = c("aut", "cre")),
     person("Pawel", "Rucki", , "pawel.rucki@roche.com", role = "aut"),
@@ -20,13 +20,13 @@ URL: https://insightsengineering.github.io/teal.widgets/,
         https://github.com/insightsengineering/teal.widgets
 BugReports: https://github.com/insightsengineering/teal.widgets/issues
 Depends: R (>= 3.6)
-Imports: bslib, checkmate (>= 2.1.0), ggplot2 (>= 3.4.3), graphics,
-        grDevices, htmltools (>= 0.5.4), lifecycle (>= 0.2.0), methods,
-        rtables (>= 0.6.6), shiny (>= 1.6.0), shinyjs, shinyWidgets (>=
-        0.5.1), styler (>= 1.2.0)
+Imports: bslib (>= 0.8.0), checkmate (>= 2.1.0), ggplot2 (>= 3.4.3),
+        graphics, grDevices, htmltools (>= 0.5.4), lifecycle (>=
+        0.2.0), methods, rtables (>= 0.6.12), shiny (>= 1.8.1), shinyjs
+        (>= 2.1.0), shinyWidgets (>= 0.5.1), styler (>= 1.2.0)
 Suggests: DT, knitr (>= 1.42), lattice (>= 0.18-4), magrittr (>= 1.5),
         png, rmarkdown (>= 2.23), rvest (>= 1.0.3), shinytest2 (>=
-        0.2.0), shinyvalidate, testthat (>= 3.1.5), withr (>= 2.1.0)
+        0.2.0), shinyvalidate, testthat (>= 3.2.3), withr (>= 2.1.0)
 VignetteBuilder: knitr, rmarkdown
 Config/Needs/verdepcheck: rstudio/bslib, mllg/checkmate,
         tidyverse/ggplot2, rstudio/htmltools, r-lib/lifecycle,
@@ -40,7 +40,7 @@ Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-01-31 16:12:58 UTC; unardid
+Packaged: 2025-08-19 11:48:17 UTC; dawidkaledkowski
 Author: Dawid Kaledkowski [aut, cre],
   Pawel Rucki [aut],
   Mahmoud Hallal [aut],
@@ -51,4 +51,4 @@ Author: Dawid Kaledkowski [aut, cre],
   F. Hoffmann-La Roche AG [cph, fnd]
 Maintainer: Dawid Kaledkowski <dawid.kaledkowski@roche.com>
 Repository: CRAN
-Date/Publication: 2025-01-31 17:50:01 UTC
+Date/Publication: 2025-08-19 23:10:02 UTC

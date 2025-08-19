@@ -6,13 +6,14 @@ verbatim_popup_deps <- function() {
     version = utils::packageVersion("teal.widgets"),
     package = "teal.widgets",
     src = "verbatim-popup",
+    stylesheet = "verbatim-popup.css",
     script = "verbatim-popup.js"
   )
 }
 
 #' A `shiny` module that pops up verbatim text.
 #' @name verbatim_popup
-#' @description `r lifecycle::badge("experimental")`
+#' @description
 #' This module consists of a button that once clicked pops up a
 #' modal window with verbatim-styled text.
 #'
@@ -27,7 +28,7 @@ verbatim_popup_deps <- function() {
 #' @examples
 #' library(shiny)
 #'
-#' ui <- fluidPage(verbatim_popup_ui("my_id", button_label = "Open popup"))
+#' ui <- bslib::page_fluid(verbatim_popup_ui("my_id", button_label = "Open popup"))
 #' srv <- function(input, output) {
 #'   verbatim_popup_srv(
 #'     "my_id",
@@ -42,21 +43,17 @@ verbatim_popup_ui <- function(id, button_label, type = c("button", "link"), ...)
   checkmate::assert_string(id)
   checkmate::assert_string(button_label)
 
-  ui_function <- switch(match.arg(type),
-    "button" = shiny::actionButton,
-    "link" = shiny::actionLink
-  )
-
   ns <- shiny::NS(id)
-  ui_args <- list(
-    inputId = ns("button"),
-    label = button_label
-  )
 
   shiny::tagList(
     verbatim_popup_deps(),
     shinyjs::useShinyjs(),
-    do.call(ui_function, c(ui_args, list(...)))
+    shiny::actionButton(
+      inputId = ns("button"),
+      label = button_label,
+      class = c("teal-widgets-busy-disable", match.arg(type)),
+      ...
+    )
   )
 }
 
@@ -126,31 +123,34 @@ button_click_observer <- function(click_event,
     handlerExpr = {
       req(modal_content())
       shiny::showModal(
-        shiny::modalDialog(
-          shiny::tagList(
+        div(
+          class = "teal-widgets button-click-observer",
+          shiny::modalDialog(
             tags$div(
-              class = "mb-4",
-              style = "margin-bottom: 1rem;",
-              shiny::actionButton(
-                paste0(copy_button_id, 1),
-                "Copy to Clipboard",
-                onclick = paste0("copyToClipboard('", copied_area_id, "')")
+              tags$div(
+                shiny::modalButton("Dismiss"),
+                shiny::actionButton(
+                  paste0(copy_button_id, 1),
+                  "Copy to Clipboard",
+                  class = "btn-primary",
+                  onclick = paste0("copyToClipboard('", copied_area_id, "')")
+                )
               ),
-              shiny::modalButton("Dismiss")
+              tags$pre(id = copied_area_id, modal_content()),
             ),
-            tags$pre(id = copied_area_id, modal_content()),
-          ),
-          title = modal_title,
-          footer = shiny::tagList(
-            shiny::actionButton(
-              paste0(copy_button_id, 2),
-              "Copy to Clipboard",
-              onclick = paste0("copyToClipboard('", copied_area_id, "')")
+            title = modal_title,
+            footer = shiny::tagList(
+              shiny::modalButton("Dismiss"),
+              shiny::actionButton(
+                paste0(copy_button_id, 2),
+                "Copy to Clipboard",
+                class = "btn-primary",
+                onclick = paste0("copyToClipboard('", copied_area_id, "')")
+              )
             ),
-            shiny::modalButton("Dismiss")
-          ),
-          size = "l",
-          easyClose = TRUE
+            size = "l",
+            easyClose = TRUE
+          )
         )
       )
     }

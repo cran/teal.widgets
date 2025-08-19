@@ -1,15 +1,3 @@
-#' Get bootstrap current version
-#' @note will work properly mainly inside a tag `.renderHook`
-#' @keywords internal
-get_bs_version <- function() {
-  theme <- bslib::bs_current_theme()
-  if (bslib::is_bs_theme(theme)) {
-    bslib::theme_version(theme)
-  } else {
-    "3"
-  }
-}
-
 #' This function checks the plot type and applies specific modifications
 #' to the plot object based on the provided parameters.
 #'
@@ -30,17 +18,4 @@ apply_plot_modifications <- function(plot_obj, plot_type, dblclicking, ranges) {
   } else {
     plot_obj
   }
-}
-
-#' This function opens a PDF graphics device using [grDevices::pdf()] to suppress
-#' the plot display in the IDE. The purpose of this function is to avoid opening graphic devices
-#' directly in the IDE.
-#'
-#' @param x lazy binding which generates the plot(s)
-#'
-#' @keywords internal
-plot_suppress <- function(x) {
-  grDevices::pdf(nullfile())
-  on.exit(grDevices::dev.off())
-  force(x)
 }

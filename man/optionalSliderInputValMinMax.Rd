@@ -2,8 +2,7 @@
 % Please edit documentation in R/optionalInput.R
 \name{optionalSliderInputValMinMax}
 \alias{optionalSliderInputValMinMax}
-\title{For \code{teal} modules we parameterize an \code{optionalSliderInput} with one argument
-\code{value_min_max}}
+\title{Optional Slider Input with minimal and maximal values}
 \usage{
 optionalSliderInputValMinMax(
   inputId,
@@ -32,13 +31,22 @@ object of class \code{shiny.tag}, e.g. an object returned by \code{\link[shiny:h
 (\code{shiny.tag}) HTML tag with range \code{sliderInput} widget.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 The \code{\link[=optionalSliderInput]{optionalSliderInput()}} function needs three arguments to determine
 whether to hide the \code{sliderInput} widget or not. For \code{teal} modules we specify an
 optional slider input with one argument here called \code{value_min_max}.
 }
+\details{
+For \code{teal} modules we parameterize an \code{optionalSliderInput} with one argument
+\code{value_min_max}
+}
 \examples{
 
-optionalSliderInputValMinMax("a", "b", 1)
-optionalSliderInputValMinMax("a", "b", c(3, 1, 5))
+ui <- bslib::page_fluid(
+  shinyjs::useShinyjs(),
+  optionalSliderInputValMinMax("a1", "b1", 1), # Hidden
+  optionalSliderInputValMinMax("a2", "b2", c(3, 1, 5)) # Shown
+)
+if (interactive()) {
+  shiny::shinyApp(ui, function(input, output) {})
+}
 }

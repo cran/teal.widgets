@@ -68,7 +68,6 @@ The width of the input passed to \code{pickerInput}  e.g. \code{'auto'}, \code{'
 non-interactive element listing selected values.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 Wrapper for \code{\link[shinyWidgets:pickerInput]{shinyWidgets::pickerInput()}} with additional features.
 When \code{fixed = TRUE} or when the number of \code{choices} is less or equal to 1 (see \code{fixed_on_single}),
 the \code{pickerInput} widget is hidden and non-interactive widget will be displayed
@@ -78,26 +77,17 @@ instead. Toggle of \code{HTML} elements is just the visual effect to avoid displ
 \examples{
 library(shiny)
 
-# Create a minimal example data frame
-data <- data.frame(
-  AGE = c(25, 30, 40, 35, 28),
-  SEX = c("Male", "Female", "Male", "Female", "Male"),
-  PARAMCD = c("Val1", "Val2", "Val3", "Val4", "Val5"),
-  PARAM = c("Param1", "Param2", "Param3", "Param4", "Param5"),
-  AVISIT = c("Visit1", "Visit2", "Visit3", "Visit4", "Visit5"),
-  stringsAsFactors = TRUE
-)
-
 ui_grid <- function(...) {
-  fluidPage(
-    fluidRow(
-      lapply(list(...), function(x) column(4, wellPanel(x)))
+  bslib::page_fluid(
+    bslib::layout_columns(
+      col_widths = c(4, 4, 4),
+      ...
     )
   )
 }
 
 ui <- ui_grid(
-  tags$div(
+  wellPanel(
     optionalSelectInput(
       inputId = "c1",
       label = "Fixed choices",
@@ -107,7 +97,7 @@ ui <- ui_grid(
     ),
     verbatimTextOutput(outputId = "c1_out")
   ),
-  tags$div(
+  wellPanel(
     optionalSelectInput(
       inputId = "c2",
       label = "Single choice",
@@ -116,7 +106,7 @@ ui <- ui_grid(
     ),
     verbatimTextOutput(outputId = "c2_out")
   ),
-  tags$div(
+  wellPanel(
     optionalSelectInput(
       inputId = "c3",
       label = "NULL choices",
@@ -124,7 +114,7 @@ ui <- ui_grid(
     ),
     verbatimTextOutput(outputId = "c3_out")
   ),
-  tags$div(
+  wellPanel(
     optionalSelectInput(
       inputId = "c4",
       label = "Default",
@@ -133,7 +123,7 @@ ui <- ui_grid(
     ),
     verbatimTextOutput(outputId = "c4_out")
   ),
-  tags$div(
+  wellPanel(
     optionalSelectInput(
       inputId = "c5",
       label = "Named vector",
@@ -142,7 +132,7 @@ ui <- ui_grid(
     ),
     verbatimTextOutput(outputId = "c5_out")
   ),
-  tags$div(
+  wellPanel(
     selectInput(
       inputId = "c6_choices", label = "Update choices", choices = letters, multiple = TRUE
     ),
